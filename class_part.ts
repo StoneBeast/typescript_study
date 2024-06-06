@@ -105,4 +105,71 @@ class SClass {
     }
 }
 
+class SEClass extends SClass {
+    public constructor(name) {
+        super(name);
+    }
+}
+
 SClass.sayHiFromStatic('hello!')
+SEClass.sayHiFromStatic('hello, from SEClass')  //  静态函数也可以被继承
+
+/*
+*   接口部分，同java
+* */
+
+interface Alarm {
+    alert(): void
+}
+
+class Door {}
+
+class SecurityDoor extends Door implements Alarm {
+    alert() {
+        console.log('SecurityDoor alert')
+    }
+}
+
+class Car implements Alarm {
+    alert() {
+        console.log('car alert')
+    }
+}
+
+let SDI = new SecurityDoor()
+SDI.alert()
+
+let car1 = new Car()
+car1.alert()
+
+/*
+    接口之间可以继承
+ */
+interface LightableAlarm extends Alarm {
+    lightOn(): void
+    lightOff(): void
+}
+
+/*
+    ts中，接口还可以继承类
+ */
+
+class Point {
+    x: number
+    y: number
+    constructor(x: number, y: number) {
+        this.x = x
+        this.y = y
+    }
+}
+
+interface Point3d extends Point {
+    z: number
+}
+
+let point3d: Point3d = {x: 1, y: 2, z: 3}
+
+/*
+    接口继承类本质上和接口继承接口没有区别，都是继承后者的结构，
+    但是也像继承接口一样，不包括构造函数、静态函数等
+ */
