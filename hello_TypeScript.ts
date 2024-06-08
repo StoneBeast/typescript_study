@@ -139,3 +139,142 @@ console.log(Days.Sun, Days[1]) // 0 Mon
  */
 enum Color {Red, Green, Blue = "blue".length}   //通过编译
 // enum Color {Red = "red".length, Green, Blue} //编译报错，因为无法获得初始值，同时又没有被手动赋值
+
+/*
+* 泛型部分
+* */
+//  应用场景1：当要创建一个函数，函数的返回内容是返回一个带有设定值的数组，那么在ts的类型环境下，要么要将
+//  返回数组的元素的类型设置为any，要么就需要一种类型的数组写一个函数，这时就需要用到泛型了
+
+//  一般情况
+function getAnyArry(length: number, defVal: any): Array<any> {
+    let arr: any[] = []
+
+    for (let i = 0; i < length; i++) {
+        arr[i] = defVal
+    }
+
+    return arr
+}
+
+let res = getAnyArry(5, 'hello')
+console.log('get any array: ', res)
+
+//  使用泛型
+function getTypeArry<T>(length: number, defVal: T): Array<T> {
+    let arr: Array<T> = []
+
+    for (let i = 0; i < length; i++) {
+        arr[i] = defVal
+    }
+
+    return arr
+}
+
+//  这里手动指定了泛型的类型，也可以不指定，让编译器自行推断
+let tArry = getTypeArry<number> (5, 3)
+// let tArry = getTypeArry (5, 3)
+console.log('get typed array: ', tArry)
+
+//  同时泛型也支持一次指定多个类型
+
+/*
+*   泛型约束，函数内使用泛型时，不能确定参数具体的类型，所以就无法对参数进行一些操作
+* */
+
+// function testF<T> (arg: T): T {
+//     console.log(arg.length) //  编译器会在这里报错，因为无法判断arg中是否有length成员
+//
+//     return arg
+// }
+
+//  这时可以使用泛型约束
+interface lengthWish {
+    length: number
+}
+
+function testF<T extends lengthWish> (arg: T): T {
+    console.log('arg length: ', arg.length)
+
+    return arg
+}
+
+let arg = 'hello!'
+arg = testF(arg)
+
+// testF(1) //  编译器报错，因为数字类型中没有length成员
+
+//  类型之间也可以互相约束
+
+function copyFields<T extends U, U>(target: T, source: U): T {
+    for (let id in source) {
+        target[id] = (<T>source)[id];
+    }
+    return target;
+}
+
+let x = { a: 1, b: 2, c: 3, d: 4 };
+
+copyFields(x, { b: 10, d: 20 });
+
+console.log('x: ', x)
+
+//  可以使用含有泛型的接口定义函数的形状
+interface CreateArrayFunc {
+    <T> (length: number, defVal: T): Array<T>
+}
+
+let Tfunc1: CreateArrayFunc
+Tfunc1 = function <T>(length, defVal): Array<T> {
+    let arr: T[] = []
+
+    for (let i = 0; i < length; i++) {
+        arr[i] = defVal
+    }
+
+    return arr
+}
+
+console.log('Tfunc1: ', Tfunc1(5, 2))
+
+//  将上面写法中接口的泛型提到上面
+interface CreateArratFunc2<T> {
+    (length: number, defVal: T): T[]
+}
+
+let TFunc2: CreateArratFunc2<number>
+TFunc2 = function<T> (length, defVal): T[] {
+    let arr: T[] = []
+
+    for (let i = 0; i < length; i++) {
+        arr[i] = defVal
+    }
+
+    return arr
+}
+
+console.log('Tfunc2: ', TFunc2(5, 22))
+
+//  泛型类
+class GenericNumber<T> {
+    zeroVal: T
+    add: (a: T, b: T) => T
+}
+
+let gI = new GenericNumber<number>()
+gI.zeroVal = 0
+gI.add = function (a, b) {
+    return a+b
+}
+
+/*
+*   泛型默认值
+* */
+function createArray<T = string>(length: number, value: T): Array<T> {
+    let result: T[] = [];
+    for (let i = 0; i < length; i++) {
+        result[i] = value;
+    }
+    return result;
+}
+console.log('createArray: ', createArray(2, 12))
