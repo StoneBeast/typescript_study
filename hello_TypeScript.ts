@@ -270,7 +270,7 @@ gI.add = function (a, b) {
 /*
 *   泛型默认值
 * */
-function createArray<T = string>(length: number, value: T): Array<T> {
+function createArray<T = string>(length: number = 4, value: T): Array<T> {
     let result: T[] = [];
     for (let i = 0; i < length; i++) {
         result[i] = value;
